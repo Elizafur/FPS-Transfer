@@ -1,28 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 public class TurretController : MonoBehaviour
 {
-    [SerializeField]
+    [ShowInInspector, PreviewField, Required, TabGroup("Prefabs")]
     public GameObject   target;
-    [SerializeField]
+    [ShowInInspector, PreviewField, Required, TabGroup("Prefabs")]
     public Transform    gun;
     private Ray         sight;
 
-    [SerializeField]
+    [ShowInInspector, TabGroup("Variables")]
     public float       reactionTime;
-    [SerializeField]
+    [ShowInInspector, TabGroup("Variables")]
     public float       fireDelay;
-    [SerializeField]
+    [ShowInInspector, TabGroup("Variables")]
     public float       scanDelay;
-
+    [HideInInspector]
     public bool        isFiring = false;
+    [HideInInspector]
     public bool        seesPlayer = false;
 
     private Vector3    lastSeenLocation = Vector3.forward;
-
+    [HideInInspector]
     public  bool       isDead = false;
+    [HideInInspector]
     public  Timer      timer;
 
     [System.Serializable]
@@ -32,6 +35,7 @@ public class TurretController : MonoBehaviour
 		public Transform bulletPrefab;
 		public Transform casingPrefab;
 	}
+    [ShowInInspector, TabGroup("Prefabs")]
     public prefabs Prefabs;
 
     [System.Serializable]
@@ -44,6 +48,7 @@ public class TurretController : MonoBehaviour
 		//Bullet prefab spawn from this point
 		public Transform bulletSpawnPoint;
 	}
+    [ShowInInspector, TabGroup("Prefabs")]
     public spawnpoints Spawnpoints;
 	
     [Tooltip("How much force is applied to the bullet when shooting.")]
@@ -102,10 +107,17 @@ public class TurretController : MonoBehaviour
         return false;
     }
 
+    IEnumerator lookAtPlayer()
+    {
+        gun.LookAt(target.transform.position);
+        yield return new WaitForSeconds(0.2f);
+    }
+
     IEnumerator scanForPlayer()
     {
         RaycastHit rayHit;
         CapsuleCollider t = target.GetComponent<CapsuleCollider>();
+        bool startedCoroutine = false;
         while (!isDead)
         {
 
@@ -114,15 +126,24 @@ public class TurretController : MonoBehaviour
             if (canSeePlayer)
             {
                 shootAtPlayer();
+                if (!startedCoroutine) 
+                {
+                    StartCoroutine(lookAtPlayer());
+                    startedCoroutine = true;
+                }
                 yield return new WaitForSeconds(fireDelay);
+            }
+            else
+            {
+                StopCoroutine(lookAtPlayer());
+                startedCoroutine = false;
             }
 
             yield return new WaitForSeconds(scanDelay);
-
-            
         }
-        yield return null;
         Destroy(this.gameObject);
+        yield return null;
+
     }
 
     void shootAtPlayer()    {
