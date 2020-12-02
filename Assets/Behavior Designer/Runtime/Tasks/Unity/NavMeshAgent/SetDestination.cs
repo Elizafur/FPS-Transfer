@@ -11,7 +11,8 @@ namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityNavMeshAgent
         public SharedGameObject targetGameObject;
         [SharedRequired]
         [Tooltip("The NavMeshAgent destination")]
-        public SharedVector3 destination;
+        private SharedTransform destinationTransform;
+        private SharedVector3 destination;
 
         // cache the navmeshagent component
         private NavMeshAgent navMeshAgent;
@@ -19,11 +20,14 @@ namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityNavMeshAgent
 
         public override void OnStart()
         {
+            destinationTransform = GetComponent<Transform>();
             var currentGameObject = GetDefaultGameObject(targetGameObject.Value);
             if (currentGameObject != prevGameObject) {
                 navMeshAgent = currentGameObject.GetComponent<NavMeshAgent>();
                 prevGameObject = currentGameObject;
             }
+
+            destination = destinationTransform.Value.position;
         }
 
         public override TaskStatus OnUpdate()

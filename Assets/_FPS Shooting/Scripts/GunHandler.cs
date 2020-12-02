@@ -21,6 +21,8 @@ public class GunHandler : MonoBehaviour
     public int totalAmmo;
     public GunAnimations motions;
 
+    public float muzzleFlashLength = 0.05f;
+
     Vector3 aimPos;
     Vector3 recoil;
     Animator animator;
@@ -102,12 +104,19 @@ public class GunHandler : MonoBehaviour
 
     IEnumerator flashMuzzle()
     {
+        if (gun.prefabName == "Railgun")
+        {
+            WSP_HighRezLaser o = GetComponentInChildren<WSP_HighRezLaser>();
+            o.FireLaser();
+        }
+
+
         Vector3 rot = Vector3.zero;
         rot.z = Random.Range(0f, 180f);
         muzzleFlash.localEulerAngles = rot;
         muzzleFlash.localScale = new Vector3(Random.Range(1.00f, 1.20f), Random.Range(1.00f, 1.20f), Random.Range(0.75f, 1.50f));
         muzzleFlash.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(muzzleFlashLength);
         muzzleFlash.gameObject.SetActive(false);
     }
 

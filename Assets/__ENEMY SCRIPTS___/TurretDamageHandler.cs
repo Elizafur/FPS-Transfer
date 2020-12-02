@@ -17,6 +17,6 @@ public class TurretDamageHandler : MonoBehaviour
 
     public void die()
     {
-        GameObject.Destroy(this);
+        Lean.Pool.LeanPool.Despawn(this);
     }
 }

@@ -326,9 +326,9 @@ public class GunController : MonoBehaviour
         if (shootingGun || playerBlocking()) return;
         if (gunSelected())
         {
-            float scroll = input.mouseScroll;
-            if (scroll >= 0.1f) ChangeSelectedGun(1);
-            else if (scroll <= -0.1f) ChangeSelectedGun(-1);
+            //float scroll = input.mouseScroll;
+            //if (scroll >= 0.1f) ChangeSelectedGun(1);
+            //else if (scroll <= -0.1f) ChangeSelectedGun(-1);
             PlayerInput p = player.GetComponent<PlayerInput>();
 
 
@@ -345,6 +345,8 @@ public class GunController : MonoBehaviour
                 SelectSpecificWeapon(4);    //Nailgun/Chaingun
             else if (p.wepSix)
                 SelectSpecificWeapon(5);    //Grenade Launcher Bouncy/Sticky mode
+            else if (p.wepSeven)
+                SelectSpecificWeapon(6);
                 
         }
     }

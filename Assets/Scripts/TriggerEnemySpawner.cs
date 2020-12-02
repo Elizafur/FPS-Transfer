@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Lean.Pool;
 
 public class TriggerEnemySpawner : MonoBehaviour
 {
@@ -40,10 +41,11 @@ public class TriggerEnemySpawner : MonoBehaviour
             
             for (int i = 0; i < Amount; ++i)  
             {
-                int randomOffset = Random.Range(-9, 9);
-                Vector3 spawnPosition = new Vector3(randomOffset + transform.position.x, transform.position.y, transform.position.z - randomOffset);
+                int randomOffsetX = Random.Range(-5, 5);
+                int randomOffsetZ = Random.Range(-5, 5);
+                Vector3 spawnPosition = new Vector3(randomOffsetX + transform.position.x, transform.position.y, transform.position.z - randomOffsetZ);
 
-                if (Physics.CheckSphere(spawnPosition, 2))
+                if (Physics.CheckBox(spawnPosition, new Vector3(.5f, .5f, .5f)))
                 {
                     --i;                //retry spawning
                     ++timesRetried;
@@ -65,19 +67,25 @@ public class TriggerEnemySpawner : MonoBehaviour
                     #if DEBUG
                         print("Spawned: " + i);
                     #endif
-                    Instantiate(Prefab, spawnPosition, Quaternion.Euler(0, 0, 0));
+                    if (timesRetried != 0)  //reset retries if we had to retry at all
+                    {
+                        timesRetried = 0;
+                        ++i;
+                    }
+                    LeanPool.Spawn(Prefab, spawnPosition, Quaternion.Euler(0, 0, 0));
                 }
             }
 
-            yield return null;
+            yield break;
         }
 
         for (int i = 0; i < Amount; ++i)                //Delayed Spawn
         {
-            int randomOffset = Random.Range(-15, 15);
-            Vector3 spawnPosition = new Vector3(randomOffset + transform.position.x, transform.position.y, transform.position.z - randomOffset);
+            int randomOffsetX = Random.Range(-5, 5);
+            int randomOffsetZ = Random.Range(-5, 5);
+            Vector3 spawnPosition = new Vector3(randomOffsetX + transform.position.x, transform.position.y, transform.position.z - randomOffsetZ);
 
-            if (Physics.CheckSphere(spawnPosition, 2))
+            if (Physics.CheckSphere(spawnPosition, .5f))
             {
                 --i;
                 ++timesRetried;
@@ -90,7 +98,12 @@ public class TriggerEnemySpawner : MonoBehaviour
             }
             else
             {
-                Instantiate(Prefab, spawnPosition, Quaternion.Euler(0, 0, 0));
+                if (timesRetried != 0)
+                {
+                    timesRetried = 0;
+                    ++i;
+                }
+                LeanPool.Spawn(Prefab, spawnPosition, Quaternion.Euler(0, 0, 0));
             }
 
             yield return new WaitForSeconds(TimeBetween);

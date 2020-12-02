@@ -20,6 +20,7 @@ public class GunObject : ScriptableObject
     //[Header("Shoot Process")]
     public GunType shootType;
     public GameObject muzzleFlash;
+    public float muzzleFlashLength;
     public PooledObject impactEffect;
     public PooledObject rigidbodyBullet;
     public float initialForce = 100f;
